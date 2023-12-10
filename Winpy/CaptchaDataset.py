@@ -32,3 +32,5 @@ class CaptchaDataset(Dataset):
         input_length = torch.full(size=(1, ), fill_value=self.input_length, dtype=torch.long)
         target_length = torch.full(size=(1, ), fill_value=self.label_length, dtype=torch.long)
         return image, target, input_length, target_length
+    
+    

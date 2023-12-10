@@ -6,26 +6,26 @@
 
 2019 年更新了：
 
-* 适配了新版 API
-* 提高了数据生成器的效率
-* 使用了 CuDNNGRU 提高了训练和预测效率
-* 更新了文档
+- 适配了新版 API
+- 提高了数据生成器的效率
+- 使用了 CuDNNGRU 提高了训练和预测效率
+- 更新了文档
 
 # 环境
 
 本项目使用的环境如下：
 
-* captcha 0.3
-* tensorflow-gpu 1.13.1
-* numpy 1.16.4
-* tqdm 4.28.1
+- captcha 0.3
+- tensorflow 1.13.1
+- numpy 1.16.4
+- tqdm 4.28.1
 
 下面几个包是用于可视化的：
 
-* matplotlib 2.2.2
-* pandas 0.23.0
-* pydot 1.4.1
-* graphviz 2.38.0-12ubuntu2.1
+- matplotlib 2.2.2
+- pandas 0.23.0
+- pydot 1.4.1
+- graphviz 2.38.0-12ubuntu2.1
 
 # captcha
 
@@ -83,7 +83,7 @@ K.set_session(sess)
 
 ## X
 
-X 的形状是 `(batch_size, height, width, 3)`，比如一批生成 128 个样本，图片宽度为170，高度为80，那么 X 的形状就是 `(128, 64, 128, 3)`，如果你想取第一张图，代码可以这样写 `X[0]`。
+X 的形状是 `(batch_size, height, width, 3)`，比如一批生成 128 个样本，图片宽度为 170，高度为 80，那么 X 的形状就是 `(128, 64, 128, 3)`，如果你想取第一张图，代码可以这样写 `X[0]`。
 
 ## y
 
@@ -108,7 +108,7 @@ class CaptchaSequence(Sequence):
         self.height = height
         self.n_class = len(characters)
         self.generator = ImageCaptcha(width=width, height=height)
-    
+
     def __len__(self):
         return self.steps
 
@@ -128,7 +128,7 @@ class CaptchaSequence(Sequence):
 
 生成器的使用方法很简单，只需要用对它取第一个 batch 即可。下面是一个例子，初始化一个数据集，设置 batch_size 和 steps 都为 1，然后取出来第一个数据，对它可视化。
 
-在这里我们对生成的  One-Hot 编码后的标签进行了解码，首先将它转为 numpy 数组，然后取36个字符中最大的数字的位置（axis=2代表字符的轴），实际上神经网络会输出36个字符的概率，我们需要将概率最大的四个字符的编号取出来，转换为字符串。
+在这里我们对生成的 One-Hot 编码后的标签进行了解码，首先将它转为 numpy 数组，然后取 36 个字符中最大的数字的位置（axis=2 代表字符的轴），实际上神经网络会输出 36 个字符的概率，我们需要将概率最大的四个字符的编号取出来，转换为字符串。
 
 ```py
 def decode(y):
@@ -161,7 +161,7 @@ x = [Dense(n_class, activation='softmax', name='c%d'%(i+1))(x) for i in range(n_
 model = Model(inputs=input_tensor, outputs=x)
 ```
 
-模型结构很简单，特征提取部分使用的是两个卷积，一个池化的结构，这个结构是学的 VGG16 的结构。我们重复五个 block，然后我们将它 Flatten，连接四个分类器，每个分类器是36个神经元，输出36个字符的概率。
+模型结构很简单，特征提取部分使用的是两个卷积，一个池化的结构，这个结构是学的 VGG16 的结构。我们重复五个 block，然后我们将它 Flatten，连接四个分类器，每个分类器是 36 个神经元，输出 36 个字符的概率。
 
 # 模型可视化
 
@@ -209,7 +209,7 @@ valid_data = CaptchaSequence(characters, batch_size=128, steps=100)
 callbacks = [EarlyStopping(patience=3), CSVLogger('cnn.csv'), ModelCheckpoint('cnn_best.h5', save_best_only=True)]
 
 model.compile(loss='categorical_crossentropy',
-              optimizer=Adam(1e-3, amsgrad=True), 
+              optimizer=Adam(1e-3, amsgrad=True),
               metrics=['accuracy'])
 model.fit_generator(train_data, epochs=100, validation_data=valid_data, workers=4, use_multiprocessing=True,
                     callbacks=callbacks)
@@ -222,11 +222,11 @@ model.fit_generator(train_data, epochs=100, validation_data=valid_data, workers=
 ```py
 model.load_weights('cnn_best.h5')
 
-callbacks = [EarlyStopping(patience=3), CSVLogger('cnn.csv', append=True), 
+callbacks = [EarlyStopping(patience=3), CSVLogger('cnn.csv', append=True),
              ModelCheckpoint('cnn_best.h5', save_best_only=True)]
 
 model.compile(loss='categorical_crossentropy',
-              optimizer=Adam(1e-4, amsgrad=True), 
+              optimizer=Adam(1e-4, amsgrad=True),
               metrics=['accuracy'])
 model.fit_generator(train_data, epochs=100, validation_data=valid_data, workers=4, use_multiprocessing=True,
                     callbacks=callbacks)
@@ -270,7 +270,7 @@ evaluate(model)
 
 # 模型总结
 
-模型的大小是10.7MB，总体准确率是 98.26%，基本上可以确定破解了此类验证码。
+模型的大小是 10.7MB，总体准确率是 98.26%，基本上可以确定破解了此类验证码。
 
 # 改进
 
@@ -285,10 +285,10 @@ With CTC](https://distill.pub/2017/ctc/)
 
 在 Keras 里面已经内置了 CTC Loss ，我们实现下面的代码即可在模型里使用 CTC Loss。
 
-* `y_pred` 是模型的输出，是按顺序输出的37个字符的概率，因为我们这里用到了循环神经网络，所以需要一个空白字符的概念；
-* `labels` 是验证码，是四个数字，每个数字代表字符在字符集里的位置
-* `input_length` 表示 `y_pred` 的长度，我们这里是16
-* `label_length` 表示 `labels` 的长度，我们这里是4
+- `y_pred` 是模型的输出，是按顺序输出的 37 个字符的概率，因为我们这里用到了循环神经网络，所以需要一个空白字符的概念；
+- `labels` 是验证码，是四个数字，每个数字代表字符在字符集里的位置
+- `input_length` 表示 `y_pred` 的长度，我们这里是 16
+- `label_length` 表示 `labels` 的长度，我们这里是 4
 
 ```py
 import tensorflow.keras.backend as K
@@ -361,7 +361,7 @@ model = Model(inputs=[input_tensor, labels, input_length, label_length], outputs
 from tensorflow.keras.utils import Sequence
 
 class CaptchaSequence(Sequence):
-    def __init__(self, characters, batch_size, steps, n_len=4, width=128, height=64, 
+    def __init__(self, characters, batch_size, steps, n_len=4, width=128, height=64,
                  input_length=16, label_length=4):
         self.characters = characters
         self.batch_size = batch_size
@@ -373,7 +373,7 @@ class CaptchaSequence(Sequence):
         self.label_length = label_length
         self.n_class = len(characters)
         self.generator = ImageCaptcha(width=width, height=height)
-    
+
     def __len__(self):
         return self.steps
 
@@ -406,7 +406,7 @@ def evaluate(model, batch_size=128, steps=20):
     return batch_acc / steps
 ```
 
-我们会通过这个函数来评估我们的模型，和上面的评估标准一样，只有全部正确，我们才算预测正确，中间有个坑，就是模型最开始训练的时候，并不一定会输出四个字符，所以我们如果遇到所有的字符都不到四个的时候，就不计算了，相当于加0，遇到多于4个字符的时候，只取前四个。
+我们会通过这个函数来评估我们的模型，和上面的评估标准一样，只有全部正确，我们才算预测正确，中间有个坑，就是模型最开始训练的时候，并不一定会输出四个字符，所以我们如果遇到所有的字符都不到四个的时候，就不计算了，相当于加 0，遇到多于 4 个字符的时候，只取前四个。
 
 # 评估回调
 
@@ -418,7 +418,7 @@ from tensorflow.keras.callbacks import Callback
 class Evaluate(Callback):
     def __init__(self):
         self.accs = []
-    
+
     def on_epoch_end(self, epoch, logs=None):
         logs = logs or {}
         acc = evaluate(base_model)
@@ -437,7 +437,7 @@ from tensorflow.keras.optimizers import *
 
 train_data = CaptchaSequence(characters, batch_size=128, steps=1000)
 valid_data = CaptchaSequence(characters, batch_size=128, steps=100)
-callbacks = [EarlyStopping(patience=5), Evaluate(), 
+callbacks = [EarlyStopping(patience=5), Evaluate(),
              CSVLogger('ctc.csv'), ModelCheckpoint('ctc_best.h5', save_best_only=True)]
 
 model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=Adam(1e-3, amsgrad=True))
@@ -448,7 +448,7 @@ model.fit_generator(train_data, epochs=100, validation_data=valid_data, workers=
 ```py
 model.load_weights('ctc_best.h5')
 
-callbacks = [EarlyStopping(patience=5), Evaluate(), 
+callbacks = [EarlyStopping(patience=5), Evaluate(),
              CSVLogger('ctc.csv', append=True), ModelCheckpoint('ctc_best.h5', save_best_only=True)]
 
 model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=Adam(1e-4, amsgrad=True))
@@ -505,7 +505,7 @@ plt.imshow(X[0], cmap='gray')
 
 # 总结
 
-模型的大小是12.8MB，准确率达到了惊人的 99.21%，即使连 0 和 O 都能精准区分，非常成功。
+模型的大小是 12.8MB，准确率达到了惊人的 99.21%，即使连 0 和 O 都能精准区分，非常成功。
 
 # 扩展
 
@@ -515,8 +515,8 @@ plt.imshow(X[0], cmap='gray')
 
 # 参考链接
 
-* [https://keras.io/getting-started/functional-api-guide/](https://keras.io/getting-started/functional-api-guide/)
-* [https://www.tensorflow.org/api_docs/python/tf/nn/ctc_loss](https://www.tensorflow.org/api_docs/python/tf/nn/ctc_loss)
-* [https://github.com/keras-team/keras/blob/master/examples/image_ocr.py](https://github.com/keras-team/keras/blob/master/examples/image_ocr.py)
-* [https://cs231n.github.io/convolutional-networks/](https://cs231n.github.io/convolutional-networks/)
-* [https://distill.pub/2017/ctc/](https://distill.pub/2017/ctc/)
+- [https://keras.io/getting-started/functional-api-guide/](https://keras.io/getting-started/functional-api-guide/)
+- [https://www.tensorflow.org/api_docs/python/tf/nn/ctc_loss](https://www.tensorflow.org/api_docs/python/tf/nn/ctc_loss)
+- [https://github.com/keras-team/keras/blob/master/examples/image_ocr.py](https://github.com/keras-team/keras/blob/master/examples/image_ocr.py)
+- [https://cs231n.github.io/convolutional-networks/](https://cs231n.github.io/convolutional-networks/)
+- [https://distill.pub/2017/ctc/](https://distill.pub/2017/ctc/)

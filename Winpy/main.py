@@ -17,6 +17,7 @@ from Model import Model
 from Utilss import train
 from Utilss import valid
 
+
 characters = '-' + string.digits + string.ascii_uppercase
 width, height, n_len, n_classes = 192, 64, 4, len(characters)#192 64
 n_input_length = 12
@@ -25,6 +26,7 @@ print(characters, width, height, n_len, n_classes)
 
 dataset = CaptchaDataset(characters, 1, width, height, n_input_length, n_len)
 image, target, input_length, label_length = dataset[0]
+
 print(''.join([characters[x] for x in target]), input_length, label_length)
 to_pil_image(image)
 
